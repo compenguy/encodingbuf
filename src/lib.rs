@@ -138,7 +138,7 @@ impl<R: Read> BufRead for EncodingToUtf8Reader<R> {
             self.fill_input_buf()?;
             self.output_buf = self.codec
                 .decode(&self.input_buf, encoding::DecoderTrap::Ignore)
-                .expect("Input encoding error");
+                .map_err(|desc| io::Error::new(io::ErrorKind::Other, format!("Input decoding error: {}", desc)))?;
             self.input_buf.clear();
         }
         Ok(&self.output_buf.as_bytes()[self.pos..])
