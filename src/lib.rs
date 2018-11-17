@@ -79,9 +79,11 @@ impl<R:Read> EncodingToUtf8Reader<R> {
         // We'll init the input buf with the detection buffer so as to not
         // lose that data
         let mut detection_buf: Vec<u8> = Vec::with_capacity(capacity);
-        inner.read(&mut detection_buf)?;
-        let encoding_name = chardet::detect(&detection_buf[0..std::cmp::min(64,detection_buf.len())]).0;
-        let codec = Self::get_encodingref(&encoding_name)
+        detection_buf.resize(capacity, 0);
+        let read_size = inner.read(&mut detection_buf)?;
+        detection_buf.resize(read_size, 0);
+        let encoding_name = chardet::detect(&detection_buf[0..std::cmp::min(64,detection_buf.len())]);
+        let codec = Self::get_encodingref(&encoding_name.0)
             .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "Failed input encoding detection"))?;
 
         Ok(Self::with_codec_and_input_buf(codec, detection_buf, inner))
@@ -112,7 +114,13 @@ impl<R:Read> EncodingToUtf8Reader<R> {
 
     fn fill_input_buf(&mut self) -> io::Result<usize> {
         if self.input_buf.is_empty() {
-            self.inner.read(&mut self.input_buf)
+            let capacity = self.input_buf.capacity();
+            if self.input_buf.len() < capacity {
+                self.input_buf.resize(capacity, 0);
+            }
+            let read_size = self.inner.read(&mut self.input_buf)?;
+            self.input_buf.resize(read_size, 0);
+            Ok(read_size)
         } else {
             Ok(0)
         }
@@ -140,6 +148,7 @@ impl<R: Read> BufRead for EncodingToUtf8Reader<R> {
                 .decode(&self.input_buf, encoding::DecoderTrap::Ignore)
                 .map_err(|desc| io::Error::new(io::ErrorKind::Other, format!("Input decoding error: {}", desc)))?;
             self.input_buf.clear();
+            self.pos = 0;
         }
         Ok(&self.output_buf.as_bytes()[self.pos..])
     }
