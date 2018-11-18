@@ -6,7 +6,7 @@ UTF-8 into arbitrary text encodings.
 # Examples
 
 ```rust
-use recoder::EncodingToUtf8Reader;
+use encodingbuf::EncodingToUtf8Reader;
 let utf8_doc = "<note>
 <to>Tove</to>
 <from>Jani</from>
@@ -14,9 +14,9 @@ let utf8_doc = "<note>
 <body>Don't forget me this weekend!</body>
 </note>";
 
-let mut reader = EncodingToUtf8Reader::new(utf8_doc.as_bytes()).expect("Failed initializing recoder reader");
+let mut reader = EncodingToUtf8Reader::new(utf8_doc.as_bytes()).expect("Failed initializing encodingbuf reader");
 let mut utf8_recoded: String = String::new();
-utf8_recoder.read_to_string(&mut utf8_recoded).expect("Failed reading recoded data");
+utf8_encodingbuf.read_to_string(&mut utf8_recoded).expect("Failed reading recoded data");
 assert_eq!(utf8_doc, utf8_recoded);
 ```
 */
@@ -43,7 +43,7 @@ const DEFAULT_BUF_SIZE: usize = 4096;
 /// # Examples
 ///
 /// ```rust
-/// use recoder::EncodingToUtf8Reader;
+/// use encodingbuf::EncodingToUtf8Reader;
 /// let utf8_doc = "<note>
 /// <to>Tove</to>
 /// <from>Jani</from>
@@ -51,9 +51,9 @@ const DEFAULT_BUF_SIZE: usize = 4096;
 /// <body>Don't forget me this weekend!</body>
 /// </note>";
 /// 
-/// let mut reader = EncodingToUtf8Reader::new(utf8_doc.as_bytes()).expect("Failed initializing recoder reader");
+/// let mut reader = EncodingToUtf8Reader::new(utf8_doc.as_bytes()).expect("Failed initializing encodingbuf reader");
 /// let mut utf8_recoded: String = String::new();
-/// utf8_recoder.read_to_string(&mut utf8_recoded).expect("Failed reading recoded data");
+/// utf8_encodingbuf.read_to_string(&mut utf8_recoded).expect("Failed reading recoded data");
 /// assert_eq!(utf8_doc, utf8_recoded);
 /// ```
 pub struct EncodingToUtf8Reader<R> {
@@ -181,9 +181,9 @@ mod reader_tests {
 <heading>Reminder</heading>
 <body>Don't forget me this weekend!</body>
 </note>";
-        let mut utf8_recoder = EncodingToUtf8Reader::new(utf8_doc.as_bytes()).expect("Failed initializing recoder reader");
+        let mut utf8_encodingbuf = EncodingToUtf8Reader::new(utf8_doc.as_bytes()).expect("Failed initializing encodingbuf reader");
         let mut utf8_recoded: String = String::new();
-        utf8_recoder.read_to_string(&mut utf8_recoded).expect("Failed reading recoded data");
+        utf8_encodingbuf.read_to_string(&mut utf8_recoded).expect("Failed reading recoded data");
         assert_eq!(utf8_doc, utf8_recoded);
     }
 
@@ -197,9 +197,9 @@ mod reader_tests {
 </note>";
         let utf16_doc = encoding::all::UTF_16LE.encode(utf8_doc, encoding::types::EncoderTrap::Strict).ok().unwrap();
 
-        let mut utf16_recoder = EncodingToUtf8Reader::new(utf16_doc.as_slice()).expect("Failed initializing recoder reader");
+        let mut utf16_encodingbuf = EncodingToUtf8Reader::new(utf16_doc.as_slice()).expect("Failed initializing encodingbuf reader");
         let mut utf16_recoded: String = String::new();
-        utf16_recoder.read_to_string(&mut utf16_recoded).expect("Failed reading recoded data");
+        utf16_encodingbuf.read_to_string(&mut utf16_recoded).expect("Failed reading recoded data");
         assert_eq!(utf8_doc, utf16_recoded);
     }
 }
