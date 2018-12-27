@@ -3,6 +3,6 @@
 extern crate encoding_rs;
 
 pub mod reader;
-// TODO: add writer;
+// TODO: pub mod writer;
 
-const DEFAULT_BUF_SIZE: usize = 4096;
+pub const DEFAULT_BUF_SIZE: usize = 4096;
